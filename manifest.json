@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "Add data into your Calendar",
+  "version": "1.0.0",
+  "description": "Add data into your Calendar",
+  "permissions": ["tabs","activeTab","storage"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["https://rezervacie.elfsport.sk/aktivity"],
+      "js": ["ticktickAccess.js"],
+      "persistent": false
+    },
+    {
+      "matches": ["https://rezervacie.elfsport.sk/moje-rezervacie*"],
+      "js": ["getcode.js"],
+      "persistent": false
+    },
+    {
+      "matches": ["https://rezervacie.elfsport.sk/rezervacia/*"],
+      "js": ["addSingleReservation.js"],
+      "persistent": false
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "index.html",
+    "default_title": "Reels button remover"
+  }
+}
