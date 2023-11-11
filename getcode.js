@@ -1,7 +1,8 @@
 // content.js
 console.log("Content script loaded");
 
-
+// Content Script 1
+const port1 = chrome.runtime.connect({ name: "getcode" });
 function convertDateFormat(inputDate) {
     // Split the input date string into day, month, and year
     var parts = inputDate.split('.');
@@ -117,48 +118,43 @@ function parseHtmlData() {
 
 //parseHtmlData()
 
-// Get the current URL
-let currentUrl = window.location.href;
+function getAuthCode(){
+    // Get the current URL
+    let currentUrl = window.location.href;
+    let paramString = "";
 
-console.log(currentUrl)
+    if (!currentUrl.includes('?')){
+        return;
+    }
 
-let paramString = "";
-
-if (currentUrl.includes('?')) {
     paramString = currentUrl.substring(currentUrl.indexOf('?') + 1);
-}
-console.log(currentUrl);
+    // Parse the URL to get the query parameters
+    const urlSearchParams = new URLSearchParams(paramString);
 
+    // Get the value of the 'code' parameter
+    const authorizationCode = urlSearchParams.get('code');
 
-// Parse the URL to get the query parameters
-const urlSearchParams = new URLSearchParams(paramString);
+    if (!authorizationCode)
+        return;
 
-// Get the value of the 'code' parameter
-const authorizationCode = urlSearchParams.get('code');
-
-
-console.log(authorizationCode)
-
-// Check if the code parameter exists
-if (authorizationCode) {
-    // The authorization code is available, and you can proceed with the token exchange
-    console.log('Authorization Code:', authorizationCode);
-    // Save the authorization code to local storage
     chrome.storage.local.set({authorizationCode: authorizationCode}, function () {
         console.log('Authorization code saved.');
     });
-} else {
-    // Handle the case where the 'code' parameter is not present in the URL
-    console.error('Authorization Code not found in the URL.');
+
+    port1.postMessage({ action: "authorizationCode"}, response => {
+        if (response) {
+            console.log("response got");
+        }
+    })
 }
 
+getAuthCode()
 
-// FIRST MESSAGE TO HANDLE
+//FIRST MESSAGE TO HANDLE
 // chrome.runtime.sendMessage({
-//     action: "exchangeToken",
-//     jsonArray: data
+//     action: "authorizationCode",
 // }, response => {
-//     if (response && response.accessToken) {
+//     if (response) {
 //         console.log("response got");
 //     }
 // });
