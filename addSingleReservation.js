@@ -55,7 +55,6 @@ function getTitle(){
     console.log(h1Elements)
     for (var i = 0; i < h1Elements.length; i++) {
         if (h1Elements[i].textContent.includes('Posilňovňa')) {
-            console.log(h1Elements)
             return h1Elements[i].innerText;
         }
     }
@@ -120,27 +119,32 @@ if (linkCreateTask) {
     });
 }
 
-if (linkDeleteTask){
-    linkDeleteTask.addEventListener("click", function (event){
-        event.preventDefault()
-
-        // TODO: dokoncit
-        port2.postMessage({action: "deleteTask"})
-    })
-}
+// if (linkDeleteTask){
+//     linkDeleteTask.addEventListener("click", function (event){
+//         event.preventDefault()
+//
+//         // TODO: dokoncit
+//         port2.postMessage({action: "deleteTask"})
+//     })
+// }
 
 
 let backgroundProcessingComplete = false;
 // Listen for messages from the background script
 port2.onMessage.addListener((message) => {
-    if (message.response === "response") {
+    if (message.response === "created") {
         console.log("Data stored, response received.");
 
         backgroundProcessingComplete = true;
         if (backgroundProcessingComplete){
-            navigateToNewPage();
+            navigateToNewPage(linkCreateTask);
+            backgroundProcessingComplete = false
         }
-
+    }
+    else if (message.response === "deleted"){
+        if (backgroundProcessingComplete)
+            navigateToNewPage(linkDeleteTask)
+        backgroundProcessingComplete = false
     }
 });
 function navigateToNewPage(link) {
