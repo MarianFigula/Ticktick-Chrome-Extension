@@ -122,10 +122,20 @@ function getAuthCode(){
     // Get the current URL
     let currentUrl = window.location.href;
     let paramString = "";
+    let isCookieSet = false;
 
     if (!currentUrl.includes('?')){
         return;
     }
+
+    chrome.storage.local.get('authorizationCode', function (data) {
+        if (data.authorizationCode) {
+            isCookieSet = true;
+        }
+    });
+
+    if (isCookieSet)
+        return;
 
     paramString = currentUrl.substring(currentUrl.indexOf('?') + 1);
     // Parse the URL to get the query parameters
@@ -133,6 +143,7 @@ function getAuthCode(){
 
     // Get the value of the 'code' parameter
     const authorizationCode = urlSearchParams.get('code');
+
 
     if (!authorizationCode)
         return;
