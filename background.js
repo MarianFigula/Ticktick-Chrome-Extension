@@ -198,11 +198,11 @@ chrome.runtime.onConnect.addListener((port, sender, sendResponse) => {
 
 
                 const taskData = {
-                    title: newTask.title,
-                    content: "",
-                    startDate: `${newTask.date}T${newTask.startTime}:00.000+0000`, //'10-31T12:00:00+0000',
-                    dueDate: `${newTask.date}T${newTask.endTime}:00.000+0000`,
-                    isAllDay: false
+                    "title": newTask.title,
+                    "content": "",
+                    "startDate" : `${newTask.date}T${newTask.startTime}:00+0000`, //'10-31T12:00:00+0000'
+                    "dueDate": `${newTask.date}T${newTask.endTime}:00+0000`,
+                    "isAllDay": false
                 };
 
                 console.log("taskData:")
@@ -223,10 +223,14 @@ chrome.runtime.onConnect.addListener((port, sender, sendResponse) => {
                         console.error('Error creating task:', createTaskError);
                     })
                 console.log("PRESLO:")
-                port.postMessage({response: "response"});
+                port.postMessage({response: "created"});
             }
             else if (message.action === "deleteTask"){
                 //TODO: delete task
+
+
+
+                port.postMessage({response: "deleted"});
             }
         })
     }
