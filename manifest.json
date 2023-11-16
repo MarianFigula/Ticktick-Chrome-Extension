@@ -7,11 +7,6 @@
   "host_permissions": ["<all_urls>"],
   "content_scripts": [
     {
-      "matches": ["https://rezervacie.elfsport.sk/aktivity"],
-      "js": ["ticktickAccess.js"],
-      "persistent": false
-    },
-    {
       "matches": ["https://rezervacie.elfsport.sk/moje-rezervacie*"],
       "js": ["getcode.js"],
       "persistent": false
@@ -22,6 +17,12 @@
       "persistent": false
     }
   ],
+  "icons": {
+    "16": "icons/check-square-16.png",
+    "48": "icons/check-square-48.png",
+    "64": "icons/check-square-64.png",
+    "128": "icons/check-square-128.png"
+  },
   "background": {
     "service_worker": "background.js"
   },
