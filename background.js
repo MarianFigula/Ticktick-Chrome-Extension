@@ -1,79 +1,23 @@
 // background.js
 
+// TODO: disconnected port, na konci je #
 
-let htmlContent = null;
-
-
-// Define a function to handle messages received from content scripts
-// function handleMessage(request, sender, sendResponse) {
-//     if (request.htmlContent) {
-//         htmlContent = request.htmlContent
-//
-//         // Send a response (optional)
-//         sendResponse({ message: "HTML content received" });
-//     }
-// }
-// Add a message listener to listen for messages from content scripts
-//chrome.runtime.onMessage.addListener(handleMessage);
-//
-// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-//     if (message.action === "exchangeToken") {
-//         const clientID = '98tJj0kwfv0IvVmSFb';
-//         const clientSecret = '$C3h&JXT^lY(p0howq$l1^)1TX9v5Jd9';
-//         const authorizationCode = message.authorizationCode;
-//         const redirectUri = 'https://rezervacie.elfsport.sk/moje-rezervacie';
-//
-//         // Set up the request parameters
-//         const url = 'https://ticktick.com/oauth/token';
-//         const data = new URLSearchParams();
-//         data.append('code', authorizationCode);
-//         data.append('grant_type', 'authorization_code');
-//         data.append('scope', 'tasks:write tasks:read');
-//         data.append('redirect_uri', redirectUri);
-//
-//         // Set up the request headers for Basic Auth and content type
-//         const headers = new Headers({
-//             'Authorization': `Basic ${btoa(`${clientID}:${clientSecret}`)}`,
-//             'Content-Type': 'application/x-www-form-urlencoded',
-//         });
-//
-//         // Make the POST request using fetch
-//         fetch(url, {
-//             method: 'POST',
-//             headers: headers,
-//             body: data,
-//         })
-//             .then(response => response.json())
-//             .then(data => {
-//                 const accessToken = data.access_token;
-//                 sendResponse({ accessToken });
-//             })
-//             .catch(error => {
-//                 console.error('Error exchanging authorization code for access token:', error);
-//             });
-//
-//         return true;
-//     }
-// });
 console.log("BACKGROUND")
 
 
-// background.js
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === "test") {
-        // Simulate a database operation (replace with your actual code)
-        console.log("Simulating data storage...");
+function requestAuth() {
 
-        // Once the database operation is complete, you can send a response
-        // back to the content script to signal that data storage is done.
-        const response = {
-            accessToken: "your-access-token" // Replace with your actual response data
-        };
+    const authorizationUrl = `https://ticktick.com/oauth/authorize?` +
+        `client_id=98tJj0kwfv0IvVmSFb` +
+        `&scope=tasks:write tasks:read` +
+        `&state=https://ticktick.com/oauth/authorize` +
+        `&redirect_uri=https://rezervacie.elfsport.sk/moje-rezervacie` +
+        `&response_type=code`;
 
-        sendResponse(response);
-    }
-});
-
+    // Open a new tab or window to the authorization URL
+    //window.open(authorizationUrl, '_blank');
+    chrome.tabs.create({ url: authorizationUrl });
+}
 
 async function exchangeAuthforAccess() {
     //console.log(message.jsonArray)
@@ -155,31 +99,39 @@ chrome.runtime.onConnect.addListener((port, sender, sendResponse) => {
 
     if (port.name === "getcode") {
 // Retrieve the authorization code from local storage
+
         port.onMessage.addListener((message) => {
-            console.log("Received message from Content Script 1:", message);
-            chrome.storage.local.get('authorizationCode', async function (data) {
-                if (data.authorizationCode) {
-                    authorizationCode = data.authorizationCode;
-                    console.log('Authorization code: ' + authorizationCode);
-                    await exchangeAuthforAccess()
-                    chrome.storage.local.set({accessToken: accessToken}, function () {
-                        console.log('accessToken saved.');
-                    });
-                    // You can use the authorization code as needed
-                } else {
-                    console.log('Authorization code not found in local storage.');
-                }
-            });
-            return true;
+            if (message.action === "authRequest") {
+                requestAuth();
+            } else if (message.action === "authorizationCode") {
+                console.log("Received message from Content Script 1:", message);
+                chrome.storage.local.get('authorizationCode', async function (data) {
+                    if (data.authorizationCode) {
+                        authorizationCode = data.authorizationCode;
+                        console.log('Authorization code: ' + authorizationCode);
+                        await exchangeAuthforAccess()
+                        chrome.storage.local.set({accessToken: accessToken}, function () {
+                            console.log('accessToken saved.');
+                        });
+                        // You can use the authorization code as needed
+                    } else {
+                        console.log('Authorization code not found in local storage.');
+                    }
+                });
+                return true;
+            }
         })
 
     } else if (port.name === "addOrRemoveTask") {
-        if (accessToken === null)
-            return
 
         console.log("RECIEVED MESSAGE - ACCES TOKEN: " + accessToken)
         port.onMessage.addListener((message) => {
             if (message.action === "createTask") {
+                if (accessToken === null){
+                    port.postMessage({response: "no access token"});
+                    return
+                }
+
                 const newTask = message.taskJson;
 
                 console.log("TASK:")
@@ -208,7 +160,7 @@ chrome.runtime.onConnect.addListener((port, sender, sendResponse) => {
                 console.log("taskData:")
                 console.log(taskData)
 
-                console.log('Request Body:', JSON.stringify(taskData, null, 2));
+                //console.log('Request Body:', JSON.stringify(taskData, null, 2));
                 // Make the POST request to create the task
                 fetch(createTaskUrl, {
                     method: 'POST',
@@ -218,16 +170,15 @@ chrome.runtime.onConnect.addListener((port, sender, sendResponse) => {
                     .then(createTaskResponse => createTaskResponse.json())
                     .then(createTaskData => {
                         console.log('Task created:', createTaskData);
+                        port.postMessage({response: "created"});
                     })
                     .catch(createTaskError => {
                         console.error('Error creating task:', createTaskError);
+                        port.postMessage({response: "error create"});
                     })
                 console.log("PRESLO:")
-                port.postMessage({response: "created"});
-            }
-            else if (message.action === "deleteTask"){
-                //TODO: delete task
-
+            } else if (message.action === "deleteTask") {
+                //TODO: delete task - will not work - dont know where to find taskID/projectID
 
 
                 port.postMessage({response: "deleted"});

@@ -3,6 +3,36 @@ console.log("Content script loaded");
 
 // Content Script 1
 const port1 = chrome.runtime.connect({ name: "getcode" });
+
+const ulNavBar = document.querySelector('ul.navbar-nav');
+
+// Create a new <li> element
+const newNavItem = document.createElement('li');
+const ticktickLink = document.createElement('a')
+
+// Set the class of the <li> element
+newNavItem.className = 'nav-item';
+ticktickLink.className = 'nav-link title'
+ticktickLink.id = 'ticktickLink'
+ticktickLink.href = "#"
+ticktickLink.innerText = "Tick Tick"
+
+
+newNavItem.appendChild(ticktickLink)
+// Append the new <li> element to the <ul>
+ulNavBar.appendChild(newNavItem);
+
+
+ticktickLink.addEventListener('click', () => {
+    console.log("link clicked")
+    port1.postMessage({ action: "authRequest"}, response => {
+        if (response) {
+            console.log("response got");
+        }
+    })
+})
+
+
 function convertDateFormat(inputDate) {
     // Split the input date string into day, month, and year
     var parts = inputDate.split('.');
@@ -130,6 +160,7 @@ function getAuthCode(){
 
     chrome.storage.local.get('authorizationCode', function (data) {
         if (data.authorizationCode) {
+            console.log("got from cookies")
             isCookieSet = true;
         }
     });
@@ -160,15 +191,5 @@ function getAuthCode(){
 }
 
 getAuthCode()
-
-//FIRST MESSAGE TO HANDLE
-// chrome.runtime.sendMessage({
-//     action: "authorizationCode",
-// }, response => {
-//     if (response) {
-//         console.log("response got");
-//     }
-// });
-
 
 

@@ -1,12 +1,8 @@
-// Retrieve the HTML content of the current page
-const pageHTML = document.documentElement.outerHTML;
-
-const parser = new DOMParser();
-const doc = parser.parseFromString(pageHTML, 'text/html');
-let task = {}
 
 // Content Script 2
 const port2 = chrome.runtime.connect({ name: "addOrRemoveTask" });
+let task = {}
+
 function parseHtml() {
     let tag = document.querySelector("h4")
     let textInTag = tag.innerText;
@@ -113,7 +109,7 @@ if (linkCreateTask) {
     linkCreateTask.addEventListener("click", function (event) {
         // Prevent the default behavior of the anchor link
         event.preventDefault();
-
+        console.log("sending action")
         // Execute your code, e.g., sending a message to the background script
         port2.postMessage({action: "createTask", taskJson: task})
     });
@@ -123,7 +119,7 @@ if (linkCreateTask) {
 //     linkDeleteTask.addEventListener("click", function (event){
 //         event.preventDefault()
 //
-//         // TODO: dokoncit
+//         // TODO: dokoncit - neda sa ziska taskID/projectID
 //         port2.postMessage({action: "deleteTask"})
 //     })
 // }
@@ -132,6 +128,7 @@ if (linkCreateTask) {
 let backgroundProcessingComplete = false;
 // Listen for messages from the background script
 port2.onMessage.addListener((message) => {
+    console.log(message.response)
     if (message.response === "created") {
         console.log("Data stored, response received.");
 
@@ -140,6 +137,11 @@ port2.onMessage.addListener((message) => {
             navigateToNewPage(linkCreateTask);
             backgroundProcessingComplete = false
         }
+    }else if (message.response === "error create" || message.response === "no access token"){
+        backgroundProcessingComplete = true;
+        if (backgroundProcessingComplete)
+            navigateToNewPage(linkCreateTask)
+        backgroundProcessingComplete = false
     }
     else if (message.response === "deleted"){
         if (backgroundProcessingComplete)
