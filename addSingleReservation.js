@@ -138,6 +138,7 @@ port2.onMessage.addListener((message) => {
             backgroundProcessingComplete = false
         }
     }else if (message.response === "error create" || message.response === "no access token"){
+        console.log("error when creating / no access token")
         backgroundProcessingComplete = true;
         if (backgroundProcessingComplete)
             navigateToNewPage(linkCreateTask)
