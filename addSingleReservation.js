@@ -9,22 +9,22 @@ function parseHtml() {
 
     textInTag = textInTag.trim()
 
-    var lines = textInTag.split('\n')
+    const lines = textInTag.split('\n')
 
     if (lines.length !== 2)
         return;
 
-    var dateLine = lines[0].trim();
-    var timeRange = lines[1].trim();
+    const dateLine = lines[0].trim();
+    const timeRange = lines[1].trim();
 
     // Extract the date using a regular expression
-    var dateMatch = dateLine.match(/(\d+\.\d+\.\d+)/);
+    const dateMatch = dateLine.match(/(\d+\.\d+\.\d+)/);
     console.log("DM: " + dateMatch)
     if (!dateMatch) {
         return;
     }
-    var date = dateMatch[0];
-    var times = timeRange.split(' - ');
+    const date = dateMatch[0];
+    const times = timeRange.split(' - ');
     if (times.length !== 2) {
         return;
     }
@@ -47,9 +47,9 @@ function parseHtml() {
 }
 
 function getTitle(){
-    var h1Elements = document.querySelectorAll('h1');
+    const h1Elements = document.querySelectorAll('h1');
     console.log(h1Elements)
-    for (var i = 0; i < h1Elements.length; i++) {
+    for (let i = 0; i < h1Elements.length; i++) {
         if (h1Elements[i].textContent.includes('Posilňovňa')) {
             return h1Elements[i].innerText;
         }
@@ -59,15 +59,15 @@ function getTitle(){
 
 function convertDateFormat(inputDate) {
     // Split the input date string into day, month, and year
-    var parts = inputDate.split('.');
+    const parts = inputDate.split('.');
 
     if (parts.length !== 3) {
         return false;
     }
 
-    var day = parts[0];
-    var month = parts[1];
-    var year = parts[2];
+    let day = parts[0];
+    let month = parts[1];
+    const year = parts[2];
 
     // Ensure day and month are zero-padded if necessary
     if (day.length === 1) {
@@ -85,10 +85,10 @@ function getTaskId(){
     let url = window.location.href
     console.log("URL: " + url)
 // Split the URL by '/'
-    var urlParts = url.split('/');
+    const urlParts = url.split('/');
 
 // Get the last part of the URL
-    var lastString = urlParts[urlParts.length - 1];
+    const lastString = urlParts[urlParts.length - 1];
 
     console.log(lastString); // Output: 4210
     return lastString;
