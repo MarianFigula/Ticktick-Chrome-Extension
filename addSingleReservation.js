@@ -29,8 +29,8 @@ function parseHtml() {
         return;
     }
 
-    var startTime = times[0];
-    var endTime = times[1];
+    const startTime = times[0];
+    const endTime = times[1];
 
     console.log(getTitle())
     console.log(date);

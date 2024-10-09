@@ -6,11 +6,11 @@ const port1 = chrome.runtime.connect({ name: "getcode" });
 
 const ulNavBar = document.querySelector('ul.navbar-nav');
 
-// Create a new <li> element
+
 const newNavItem = document.createElement('li');
 const ticktickLink = document.createElement('a')
 
-// Set the class of the <li> element
+
 newNavItem.className = 'nav-item';
 ticktickLink.className = 'nav-link title'
 ticktickLink.id = 'ticktickLink'
@@ -35,17 +35,16 @@ ticktickLink.addEventListener('click', () => {
 
 function convertDateFormat(inputDate) {
     // Split the input date string into day, month, and year
-    var parts = inputDate.split('.');
+    const parts = inputDate.split('.');
 
     if (parts.length !== 3) {
         return false;
     }
 
-    var day = parts[0];
-    var month = parts[1];
-    var year = parts[2];
+    let day = parts[0];
+    let month = parts[1];
+    let year = parts[2];
 
-    // Ensure day and month are zero-padded if necessary
     if (day.length === 1) {
         day = "0" + day;
     }
@@ -53,19 +52,19 @@ function convertDateFormat(inputDate) {
         month = "0" + month;
     }
 
-    // Construct the new date string in "yyyy-MM-dd" format
+
     return year + "-" + month + "-" + day;
 }
 
-// Retrieve the HTML content of the current page
+
 const pageHTML = document.documentElement.outerHTML;
 
 
 const parser = new DOMParser();
 const doc = parser.parseFromString(pageHTML, 'text/html');
-var data = [];
+const data = [];
 function parseHtmlData() {
-    // Find the first table element in the parsed document
+
     const firstTable = doc.querySelector('table');
 
     if (!firstTable){

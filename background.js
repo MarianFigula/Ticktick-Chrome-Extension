@@ -92,7 +92,7 @@ async function exchangeAuthforAccess() {
         });
 }
 
-var authorizationCode = null
+let authorizationCode = null
 let accessToken = null;
 //
 chrome.runtime.onConnect.addListener((port, sender, sendResponse) => {
