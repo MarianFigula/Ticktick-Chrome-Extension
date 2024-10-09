@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Add data into your Calendar",
+  "name": "Add workout session from website to TickTick",
   "version": "1.0.0",
   "description": "Add data into your Calendar",
   "permissions": ["tabs","activeTab","storage"],
