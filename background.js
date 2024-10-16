@@ -14,15 +14,11 @@ function requestAuth() {
         `&redirect_uri=https://rezervacie.elfsport.sk/moje-rezervacie` +
         `&response_type=code`;
 
-    // Open a new tab or window to the authorization URL
-    //window.open(authorizationUrl, '_blank');
     chrome.tabs.create({ url: authorizationUrl });
 }
 
 async function exchangeAuthforAccess() {
-    //console.log(message.jsonArray)
 
-    //const allTasks = message.jsonArray
     const clientID = '98tJj0kwfv0IvVmSFb';
     const clientSecret = '$C3h&JXT^lY(p0howq$l1^)1TX9v5Jd9';
     const redirectUri = 'https://rezervacie.elfsport.sk/moje-rezervacie';
@@ -53,39 +49,6 @@ async function exchangeAuthforAccess() {
             console.log(tokenData)
             accessToken = tokenData.access_token;
             console.log(`Access Token: ${accessToken}`);
-
-            // allTasks.forEach(task => {
-            //
-            //     //console.log(`${task.date}'T'${task.startTime}:00+0000`)
-            //     // Now, you have the access token, so you can proceed to create the task
-            //     const createTaskUrl = 'https://ticktick.com/open/v1/task';
-            //     const createTaskHeaders = new Headers({
-            //         'Authorization': `Bearer ${accessToken}`,
-            //         'Content-Type': 'application/json',
-            //     });
-            //
-            //     const taskData = {
-            //         title: task.title,
-            //         content: "",
-            //         startDate: `${task.date}T${task.startTime}:00+0000`, //'10-31T12:00:00+0000',
-            //         dueDate: `${task.date}T${task.endTime}:00+0000`,
-            //         isAllDay: false
-            //     };
-            //
-            //     // Make the POST request to create the task
-            //     fetch(createTaskUrl, {
-            //         method: 'POST',
-            //         headers: createTaskHeaders,
-            //         body: JSON.stringify(taskData),
-            //     })
-            //         .then(createTaskResponse => createTaskResponse.json())
-            //         .then(createTaskData => {
-            //             console.log('Task created:', createTaskData);
-            //         })
-            //         .catch(createTaskError => {
-            //             console.error('Error creating task:', createTaskError);
-            //         });
-            // })
         })
         .catch(tokenError => {
             console.error('Error exchanging authorization code for access token:', tokenError);
@@ -95,10 +58,9 @@ async function exchangeAuthforAccess() {
 let authorizationCode = null
 let accessToken = null;
 //
-chrome.runtime.onConnect.addListener((port, sender, sendResponse) => {
+chrome.runtime.onConnect.addListener( (port, sender, sendResponse) => {
 
     if (port.name === "getcode") {
-// Retrieve the authorization code from local storage
 
         port.onMessage.addListener((message) => {
             if (message.action === "authRequest") {
@@ -113,7 +75,6 @@ chrome.runtime.onConnect.addListener((port, sender, sendResponse) => {
                         chrome.storage.local.set({accessToken: accessToken}, function () {
                             console.log('accessToken saved.');
                         });
-                        // You can use the authorization code as needed
                     } else {
                         console.log('Authorization code not found in local storage.');
                     }
@@ -125,9 +86,9 @@ chrome.runtime.onConnect.addListener((port, sender, sendResponse) => {
     } else if (port.name === "addOrRemoveTask") {
 
         console.log("RECIEVED MESSAGE - ACCES TOKEN: " + accessToken)
-        port.onMessage.addListener((message) => {
+        port.onMessage.addListener( (message) => {
             if (message.action === "createTask") {
-                if (accessToken === null){
+                if (accessToken === null) {
                     port.postMessage({response: "no access token"});
                     return
                 }
@@ -140,8 +101,7 @@ chrome.runtime.onConnect.addListener((port, sender, sendResponse) => {
                 console.log(`${newTask.date}T${newTask.startTime}:00+0000`)
                 console.log(newTask.startTime)
                 console.log(newTask.endTime)
-                //console.log(`${task.date}'T'${task.startTime}:00+0000`)
-                // Now, you have the access token, so you can proceed to create the task
+
                 const createTaskUrl = 'https://ticktick.com/open/v1/task';
                 const createTaskHeaders = new Headers({
                     'Authorization': `Bearer ${accessToken}`,
@@ -149,11 +109,13 @@ chrome.runtime.onConnect.addListener((port, sender, sendResponse) => {
                 });
 
 
+                // Modify task creation to use UTC times
                 const taskData = {
                     "title": newTask.title,
                     "content": "",
-                    "startDate" : `${newTask.date}T${newTask.startTime}:00+0000`, //'10-31T12:00:00+0000'
-                    "dueDate": `${newTask.date}T${newTask.endTime}:00+0000`,
+                    "startDate" : `${newTask.date}T${newTask.startTime}:00+0200`, //'10-31T12:00:00+0000'
+                    "dueDate": `${newTask.date}T${newTask.startTime}:00+0200`,
+                    "timeZone": `${newTask.timeZone}`,
                     "isAllDay": false
                 };
 
@@ -186,43 +148,3 @@ chrome.runtime.onConnect.addListener((port, sender, sendResponse) => {
         })
     }
 });
-
-
-//
-//
-// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-//     if (message.action === "createTask") {
-//         const accessToken = message.accessToken; // Access token obtained earlier
-//
-//         // Task details to be sent in the request body
-//         const taskData = {
-//             title: message.title,
-//             content: message.content,
-//             startDate: message.startDate,
-//             dueDate: message.dueDate,
-//         };
-//
-//         // Set up the request parameters
-//         const url = 'https://ticktick.com/open/v1/task';
-//         const headers = new Headers({
-//             'Authorization': `Bearer ${accessToken}`,
-//             'Content-Type': 'application/json',
-//         });
-//
-//         // Make the POST request using fetch
-//         fetch(url, {
-//             method: 'POST',
-//             headers: headers,
-//             body: JSON.stringify(taskData),
-//         })
-//             .then(response => response.json())
-//             .then(data => {
-//                 console.log('Task created:', data);
-//             })
-//             .catch(error => {
-//                 console.error('Error creating task:', error);
-//             });
-//
-//         return true;
-//     }
-// });

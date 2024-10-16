@@ -43,6 +43,7 @@ function parseHtml() {
     task['startTime'] = startTime.trim()
     task['endTime'] = endTime.trim()
     task['myTaskId'] = getTaskId()
+    task['timeZone'] = "Europe/Bratislava";
 
 }
 
@@ -58,7 +59,6 @@ function getTitle(){
 }
 
 function convertDateFormat(inputDate) {
-    // Split the input date string into day, month, and year
     const parts = inputDate.split('.');
 
     if (parts.length !== 3) {
@@ -77,17 +77,12 @@ function convertDateFormat(inputDate) {
         month = "0" + month;
     }
 
-    // Construct the new date string in "yyyy-MM-dd" format
     return year + "-" + month + "-" + day;
 }
 
 function getTaskId(){
     let url = window.location.href
-    console.log("URL: " + url)
-// Split the URL by '/'
     const urlParts = url.split('/');
-
-// Get the last part of the URL
     const lastString = urlParts[urlParts.length - 1];
 
     console.log(lastString); // Output: 4210
@@ -107,22 +102,12 @@ const linkDeleteTask = document.querySelector("a.btn-danger"); // Select the anc
 
 if (linkCreateTask) {
     linkCreateTask.addEventListener("click", function (event) {
-        // Prevent the default behavior of the anchor link
         event.preventDefault();
         console.log("sending action")
         // Execute your code, e.g., sending a message to the background script
         port2.postMessage({action: "createTask", taskJson: task})
     });
 }
-
-// if (linkDeleteTask){
-//     linkDeleteTask.addEventListener("click", function (event){
-//         event.preventDefault()
-//
-//         // TODO: dokoncit - neda sa ziska taskID/projectID
-//         port2.postMessage({action: "deleteTask"})
-//     })
-// }
 
 
 let backgroundProcessingComplete = false;
