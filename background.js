@@ -108,12 +108,10 @@ chrome.runtime.onConnect.addListener( (port, sender, sendResponse) => {
                     'Content-Type': 'application/json',
                 });
 
-
-                // Modify task creation to use UTC times
                 const taskData = {
                     "title": newTask.title,
                     "content": "",
-                    "startDate" : `${newTask.date}T${newTask.startTime}:00+0200`, //'10-31T12:00:00+0000'
+                    "startDate" : `${newTask.date}T${newTask.startTime}:00+0200`,
                     "dueDate": `${newTask.date}T${newTask.startTime}:00+0200`,
                     "timeZone": `${newTask.timeZone}`,
                     "isAllDay": false
@@ -122,8 +120,6 @@ chrome.runtime.onConnect.addListener( (port, sender, sendResponse) => {
                 console.log("taskData:")
                 console.log(taskData)
 
-                //console.log('Request Body:', JSON.stringify(taskData, null, 2));
-                // Make the POST request to create the task
                 fetch(createTaskUrl, {
                     method: 'POST',
                     headers: createTaskHeaders,
@@ -141,8 +137,6 @@ chrome.runtime.onConnect.addListener( (port, sender, sendResponse) => {
                 console.log("PRESLO:")
             } else if (message.action === "deleteTask") {
                 //TODO: delete task - will not work - dont know where to find taskID/projectID
-
-
                 port.postMessage({response: "deleted"});
             }
         })

@@ -4,15 +4,12 @@ const port2 = chrome.runtime.connect({ name: "addOrRemoveTask" });
 let task = {}
 
 function parseHtml() {
-    let tag = document.querySelector("h4")
-    let textInTag = tag.innerText;
-
-    textInTag = textInTag.trim()
+    const tag = document.querySelector("h4")
+    const textInTag = tag.innerText.trim();
 
     const lines = textInTag.split('\n')
 
-    if (lines.length !== 2)
-        return;
+    if (lines.length !== 2) return;
 
     const dateLine = lines[0].trim();
     const timeRange = lines[1].trim();
@@ -20,14 +17,13 @@ function parseHtml() {
     // Extract the date using a regular expression
     const dateMatch = dateLine.match(/(\d+\.\d+\.\d+)/);
     console.log("DM: " + dateMatch)
-    if (!dateMatch) {
-        return;
-    }
+
+    if (!dateMatch) return;
+
     const date = dateMatch[0];
     const times = timeRange.split(' - ');
-    if (times.length !== 2) {
-        return;
-    }
+
+    if (times.length !== 2) return;
 
     const startTime = times[0];
     const endTime = times[1];
@@ -61,21 +57,14 @@ function getTitle(){
 function convertDateFormat(inputDate) {
     const parts = inputDate.split('.');
 
-    if (parts.length !== 3) {
-        return false;
-    }
+    if (parts.length !== 3) return false;
 
     let day = parts[0];
     let month = parts[1];
     const year = parts[2];
 
-    // Ensure day and month are zero-padded if necessary
-    if (day.length === 1) {
-        day = "0" + day;
-    }
-    if (month.length === 1) {
-        month = "0" + month;
-    }
+    day = day.length === 1 ? "0" + day : day;
+    month = month.length === 1 ? "0" + month : month;
 
     return year + "-" + month + "-" + day;
 }

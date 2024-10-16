@@ -34,28 +34,19 @@ ticktickLink.addEventListener('click', () => {
 
 
 function convertDateFormat(inputDate) {
-    // Split the input date string into day, month, and year
     const parts = inputDate.split('.');
 
-    if (parts.length !== 3) {
-        return false;
-    }
+    if (parts.length !== 3) return false;
 
     let day = parts[0];
     let month = parts[1];
-    let year = parts[2];
+    const year = parts[2];
 
-    if (day.length === 1) {
-        day = "0" + day;
-    }
-    if (month.length === 1) {
-        month = "0" + month;
-    }
-
+    day = day.length === 1 ? "0" + day : day;
+    month = month.length === 1 ? "0" + month : month;
 
     return year + "-" + month + "-" + day;
 }
-
 
 const pageHTML = document.documentElement.outerHTML;
 
